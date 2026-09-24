@@ -26,6 +26,35 @@ handling is the part that is actually easy to get wrong.
 - **Profile** showing your real account, with legal links, sign out and account deletion
 - **Stay signed in** across restarts, with the token in secure storage
 
+## The screens
+
+All twelve captured from a release build on an iPhone 17 simulator, signed in
+against the live API.
+
+### Getting in
+
+| Splash | Sign in | Sign up |
+|---|---|---|
+| ![Splash](docs/screenshots/01-splash.png) | ![Sign in](docs/screenshots/02-sign-in.png) | ![Sign up](docs/screenshots/03-sign-up.png) |
+| Held for 2.2 seconds while the stored session is checked. The mark breathes and the bar keeps sweeping, so a slow API never looks like a frozen screen. | Note the empty fields. Development builds prefill the test account; release builds never do. | The button is disabled until the terms box is ticked, which is what both stores require. |
+
+| Forgot password | Reset sent | Validation |
+|---|---|---|
+| ![Forgot password](docs/screenshots/04-forgot-password.png) | ![Reset sent](docs/screenshots/05-reset-sent.png) | ![Validation](docs/screenshots/09-validation.png) |
+| A sign in screen with no way out of a forgotten password is a dead end, so the screen exists even though the endpoint does not. | The confirmation a real reset would show, and a note saying plainly that nothing was sent. | Errors appear under the field they belong to, and the space for them is always reserved so the form never jumps. |
+
+### Signed in
+
+| Dashboard | Trip detail |
+|---|---|
+| ![Dashboard](docs/screenshots/06-dashboard.png) | ![Trip detail](docs/screenshots/07-trip-detail.png) |
+| The name, the verified tick and the amber prompt are all real, read from `GET /api/auth/me`. The trip content is sample data. Behind the header a dotted route line runs with a marker travelling along it. | Opens over the dashboard so the tab bar stays put. Booking is visibly disabled and says what it needs. |
+
+| Profile | Account deletion | Trips | Wallet |
+|---|---|---|---|
+| ![Profile](docs/screenshots/11-profile.png) | ![Account deletion](docs/screenshots/12-account-deletion.png) | ![Trips](docs/screenshots/08-trips.png) | ![Wallet](docs/screenshots/10-wallet.png) |
+| Everything here is live: name, email, role, rating, and all four verification flags. | Legal links and in app account deletion, both required by the stores. | Says what it is for rather than showing a blank screen. | Same. |
+
 ## Running it
 
 You need Node 20 or newer, and Xcode or Android Studio.
@@ -130,6 +159,83 @@ for later:
   you to email support instead. The flow and the two step confirmation are in
   place. It needs a `DELETE /api/auth/me` endpoint, which the API does not have
   yet, and the app says so plainly rather than pretending to delete anything.
+
+## Security review
+
+I audited this before submitting rather than after. One real vulnerability, found and fixed.
+
+### The one that mattered: credentials in the shipped bundle
+
+The sign in form was prefilled from `EXPO_PUBLIC_DEMO_EMAIL` and
+`EXPO_PUBLIC_DEMO_PASSWORD`, held in a gitignored `.env`. That felt safe and
+was not.
+
+`EXPO_PUBLIC_*` variables are **not runtime configuration**. Metro substitutes
+them into the JavaScript at build time. I exported the bundle and searched it:
+
+```
+FOUND IN BUNDLE: Test@1234567
+FOUND IN BUNDLE: referred_test@sr2go.com
+```
+
+Anyone who downloaded the app could have run `strings` on it and read the
+password. Gitignoring `.env` protects the repository and does nothing for the
+binary.
+
+The prefill is now gated on `__DEV__`, so a release build ignores those
+variables entirely. Re-exported to confirm:
+
+```
+gone from bundle: Test@1234567
+gone from bundle: referred_test@sr2go.com
+```
+
+The sign in screenshot above shows the same thing from the other side: empty
+fields in a release build.
+
+### Where the tokens are kept
+
+`expo-secure-store`, under one key. On iOS that is the **Keychain**; on Android
+**EncryptedSharedPreferences**. Both are handled by the operating system.
+
+`AsyncStorage` appears nowhere in this codebase except in a comment explaining
+why it is not used: it is an unencrypted file in the app sandbox, readable on a
+rooted or jailbroken device. A JWT is a credential and belongs behind the OS.
+
+Signing out deletes the key, so nothing is left to restore from.
+
+### The rest of the audit
+
+| Check | Result |
+|---|---|
+| Credentials in git history | None. `.env` was never tracked |
+| Transport | HTTPS only. No plain `http` anywhere in the source |
+| Token exposure | Only ever an `Authorization` header, only to the API base |
+| Tokens in logs | None. Logging is compiled out of release builds entirely |
+| Deep links | `Linking.openURL` only ever receives hardcoded legal URLs |
+| Dependencies | 10 moderate, all inside `@expo/cli` build tooling. None ship in the app |
+
+One thing worth crediting to the API: a wrong password and an unknown email
+both return the same `Invalid credentials`. That prevents user enumeration and
+is the right choice.
+
+### Accessibility, measured not guessed
+
+Contrast was calculated rather than eyeballed, which turned up three failures
+against WCAG AA:
+
+| | Before | After |
+|---|---|---|
+| Placeholder text in fields | 2.28:1 | 4.54:1 |
+| Brand blue as body text | 3.03:1 | 5.90:1 |
+| White label on the primary button | 2.51:1 | 5.90:1 to 10.24:1 |
+
+That last one existed in the original design. The button gradient started at
+`#4FA8FF`, which is too light to carry white text.
+
+Three navigation links also had no `accessibilityRole`, so a screen reader
+announced them as plain text rather than buttons, and the wallet Top up control
+was a 30pt target against a 44pt minimum. Both fixed.
 
 ## What is placeholder, and why
 
