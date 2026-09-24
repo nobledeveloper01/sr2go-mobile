@@ -14,6 +14,7 @@ import { useAuthForm } from '../hooks/useAuthForm';
 import { useEntrance } from '../hooks/useEntrance';
 import type { AuthStackParams } from '../navigation/types';
 import { colors, radii, spacing, typography } from '../theme';
+import { devCredentials } from '../utils/dev-credentials';
 import { validateSignIn } from '../utils/validation';
 
 type Props = NativeStackScreenProps<AuthStackParams, 'SignIn'>;
@@ -33,12 +34,10 @@ export function SignInScreen({ navigation }: Props) {
   );
 
   const form = useAuthForm(
-    {
-      // Prefilled from the environment so a reviewer can sign in without
-      // typing. Empty in any build that does not set them, and never committed.
-      email: process.env.EXPO_PUBLIC_DEMO_EMAIL ?? '',
-      password: process.env.EXPO_PUBLIC_DEMO_PASSWORD ?? '',
-    },
+    // Prefilled in development so a reviewer can sign in without typing, and
+    // empty in any release build. See dev-credentials.ts for why that gate
+    // matters more than it looks.
+    devCredentials(),
     validateSignIn,
     submit,
   );
@@ -114,7 +113,12 @@ export function SignInScreen({ navigation }: Props) {
 
         <Animated.View style={[styles.footer, at(0.45, 0.9)]}>
           <Text style={styles.footerText}>New to SR2Go?</Text>
-          <Pressable onPress={() => navigation.navigate('SignUp')} hitSlop={8}>
+          <Pressable
+            onPress={() => navigation.navigate('SignUp')}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Create an account"
+          >
             <Text style={styles.footerLink}>Create an account</Text>
           </Pressable>
         </Animated.View>

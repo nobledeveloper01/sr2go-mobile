@@ -8,6 +8,8 @@
  */
 import * as SecureStore from 'expo-secure-store';
 
+import { warn } from '../utils/log';
+
 import type { AuthSession } from './endpoints';
 
 const KEY = 'sr2go.session';
@@ -28,7 +30,7 @@ export const saveSession = async (session: AuthSession): Promise<void> => {
     // The session still works for this run, it just will not survive a
     // restart. Better than refusing a sign in that already succeeded, but it
     // is a real fault, so it is not swallowed silently in development.
-    console.warn('[session] could not save to secure storage', error);
+    warn('[session] could not save to secure storage', error);
   }
 };
 
@@ -42,7 +44,7 @@ export const loadSession = async (): Promise<AuthSession | null> => {
   } catch (error) {
     // Unavailable, unreadable, or stored in an older shape. All of them mean
     // the same thing to the caller: there is no session to restore.
-    console.warn('[session] could not read secure storage', error);
+    warn('[session] could not read secure storage', error);
     await clearSession();
     return null;
   }

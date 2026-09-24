@@ -142,7 +142,7 @@ export function SignUpScreen({ navigation }: Props) {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Already have an account?</Text>
-          <Pressable onPress={navigation.goBack} hitSlop={8}>
+          <Pressable onPress={navigation.goBack} hitSlop={8} accessibilityRole="button" accessibilityLabel="Sign in">
             <Text style={styles.footerLink}>Sign in</Text>
           </Pressable>
         </View>

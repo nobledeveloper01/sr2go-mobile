@@ -100,7 +100,14 @@ export function HomeScreen() {
 
                   {/* Fills the height with something useful rather than air,
                       and is the action people actually come to a wallet for. */}
-                  <Pressable style={styles.topUp} accessibilityRole="button" accessibilityLabel="Top up your wallet">
+                  <Pressable
+                    style={styles.topUp}
+                    // The visual pill is 30pt so the card stays compact, but
+                    // the tappable area is extended to clear 44pt.
+                    hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+                    accessibilityRole="button"
+                    accessibilityLabel="Top up your wallet"
+                  >
                     <Plus size={14} color={colors.textOnDark} />
                     <Text style={styles.topUpText}>Top up</Text>
                   </Pressable>

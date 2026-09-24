@@ -144,7 +144,7 @@ export function ForgotPasswordScreen({ navigation }: Props) {
 
         <Animated.View style={[styles.footer, at(0.55, 1)]}>
           <Text style={styles.footerText}>Remembered it?</Text>
-          <Pressable onPress={navigation.goBack} hitSlop={8}>
+          <Pressable onPress={navigation.goBack} hitSlop={8} accessibilityRole="button" accessibilityLabel="Sign in">
             <Text style={styles.footerLink}>Sign in</Text>
           </Pressable>
         </Animated.View>

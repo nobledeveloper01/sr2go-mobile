@@ -9,6 +9,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 
+import { warn } from '../utils/log';
+
 import * as api from '../api/endpoints';
 import { MINIMUM_SPLASH_MS } from '../screens/SplashScreen';
 import type { AuthSession, Profile } from '../api/endpoints';
@@ -73,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(current);
         await settle('signedIn');
       } catch (error) {
-        console.warn('[auth] session restore failed', error);
+        warn('[auth] session restore failed', error);
         await clearSession();
         await settle('signedOut');
       }
