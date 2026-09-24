@@ -11,10 +11,10 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ArrowRight, BadgeCheck, Bell, Leaf, Search, ShieldAlert, Wallet } from 'lucide-react-native';
+import { ArrowRight, BadgeCheck, Bell, Leaf, Plus, Search, ShieldAlert, Wallet } from 'lucide-react-native';
 
 import { popularRoutes, upcomingTrips, walletSummary } from '../api/sample-data';
-import { GradientBackground } from '../components/GradientBackground';
+import { HeroBackdrop } from '../components/HeroBackdrop';
 import { ROUTE_CARD_GAP, ROUTE_CARD_WIDTH, RouteCard } from '../components/RouteCard';
 import { TripCard } from '../components/TripCard';
 import { useAuth } from '../context/AuthContext';
@@ -57,14 +57,22 @@ export function HomeScreen() {
         ListHeaderComponent={
           <View>
             <View style={[styles.hero, { paddingTop: insets.top + spacing(4) }]}>
-              <GradientBackground variant="hero" />
+              <HeroBackdrop />
 
               <View style={styles.heroTop}>
-                <View>
-                  <Text style={styles.greeting}>{greeting()}</Text>
-                  <View style={styles.nameRow}>
-                    <Text style={styles.name}>{firstName}</Text>
-                    {profile?.nin_verified === true && <BadgeCheck size={18} color="#FFFFFF" />}
+                <View style={styles.identity}>
+                  <View style={styles.avatar}>
+                    <Text style={styles.avatarInitial}>{firstName.charAt(0).toUpperCase()}</Text>
+                    {profile?.nin_verified === true && (
+                      <View style={styles.avatarBadge}>
+                        <BadgeCheck size={13} color="#FFFFFF" />
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={styles.identityText}>
+                    <Text style={styles.greeting}>{greeting()}</Text>
+                    <Text style={styles.name} numberOfLines={1}>{firstName}</Text>
                   </View>
                 </View>
 
@@ -80,9 +88,41 @@ export function HomeScreen() {
               </Pressable>
 
               <View style={styles.stats}>
-                <Stat icon={<Wallet size={16} color={colors.textOnDark} />} value={naira(walletSummary.balance)} label="Wallet" />
-                <Stat icon={<ArrowRight size={16} color={colors.textOnDark} />} value={String(walletSummary.tripsTaken)} label="Trips" />
-                <Stat icon={<Leaf size={16} color={colors.textOnDark} />} value={`${walletSummary.co2SavedKg}kg`} label="CO2 saved" />
+                {/* The balance is what people open a wallet to see, so it gets
+                    the width and the weight. The other two are context. */}
+                <View style={[styles.stat, styles.statLead]}>
+                  <View style={styles.statTop}>
+                    <Wallet size={15} color={colors.textOnDark} />
+                    <Text style={styles.statLabel}>Wallet</Text>
+                  </View>
+
+                  <Text style={styles.statLead1}>{naira(walletSummary.balance)}</Text>
+
+                  {/* Fills the height with something useful rather than air,
+                      and is the action people actually come to a wallet for. */}
+                  <Pressable style={styles.topUp} accessibilityRole="button" accessibilityLabel="Top up your wallet">
+                    <Plus size={14} color={colors.textOnDark} />
+                    <Text style={styles.topUpText}>Top up</Text>
+                  </Pressable>
+                </View>
+
+                <View style={styles.statPair}>
+                  <View style={styles.stat}>
+                    <View style={styles.statTop}>
+                      <ArrowRight size={13} color="rgba(255,255,255,0.8)" />
+                      <Text style={styles.statLabel}>Trips</Text>
+                    </View>
+                    <Text style={styles.statValue}>{walletSummary.tripsTaken}</Text>
+                  </View>
+
+                  <View style={styles.stat}>
+                    <View style={styles.statTop}>
+                      <Leaf size={13} color="rgba(255,255,255,0.8)" />
+                      <Text style={styles.statLabel}>CO2 saved</Text>
+                    </View>
+                    <Text style={styles.statValue}>{walletSummary.co2SavedKg}kg</Text>
+                  </View>
+                </View>
               </View>
             </View>
 
@@ -125,27 +165,28 @@ export function HomeScreen() {
   );
 }
 
-function Stat({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
-  return (
-    <View style={styles.stat}>
-      {icon}
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.surfaceSunken },
   list: { paddingBottom: spacing(10) },
   hero: {
-    paddingHorizontal: spacing(6), paddingBottom: spacing(6), gap: spacing(5),
+    paddingHorizontal: spacing(6), paddingBottom: spacing(6), gap: spacing(4),
     borderBottomLeftRadius: radii.xl, borderBottomRightRadius: radii.xl, overflow: 'hidden',
   },
-  heroTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
-  greeting: { ...typography.body, color: colors.textOnDarkMuted },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: spacing(2) },
-  name: { ...typography.display, color: colors.textOnDark },
+  heroTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  identity: { flexDirection: 'row', alignItems: 'center', gap: spacing(3), flex: 1 },
+  avatar: {
+    width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.18)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)',
+  },
+  avatarInitial: { ...typography.title, color: colors.textOnDark },
+  avatarBadge: {
+    position: 'absolute', bottom: -2, right: -2,
+    width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.success, borderWidth: 2, borderColor: '#1360B8',
+  },
+  identityText: { flex: 1 },
+  greeting: { ...typography.caption, color: colors.textOnDarkMuted },
+  name: { ...typography.display, fontSize: 27, color: colors.textOnDark },
   bell: {
     width: 44, height: 44, borderRadius: radii.pill, alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)',
@@ -158,11 +199,23 @@ const styles = StyleSheet.create({
   searchText: { ...typography.body, color: colors.textMuted },
   stats: { flexDirection: 'row', gap: spacing(3) },
   stat: {
-    flex: 1, alignItems: 'center', gap: spacing(1), paddingVertical: spacing(3),
-    borderRadius: radii.md, backgroundColor: 'rgba(255,255,255,0.12)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)',
+    flex: 1, justifyContent: 'center', gap: spacing(1.5), paddingHorizontal: spacing(3.5),
+    paddingVertical: spacing(2.5), minHeight: 62,
+    borderRadius: radii.md, backgroundColor: 'rgba(255,255,255,0.14)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)',
   },
-  statValue: { ...typography.label, color: colors.textOnDark },
+  // The lead card matches the stacked pair beside it exactly, so the row has
+  // one height rather than one card stretching to fill a gap.
+  statLead: { flex: 1.15, justifyContent: 'space-between', gap: spacing(2), paddingVertical: spacing(3) },
+  statPair: { flex: 1, gap: spacing(2) },
+  topUp: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing(1.5),
+    minHeight: 30, borderRadius: radii.sm, backgroundColor: 'rgba(255,255,255,0.18)',
+  },
+  topUpText: { ...typography.caption, color: colors.textOnDark, fontWeight: '700' },
+  statTop: { flexDirection: 'row', alignItems: 'center', gap: spacing(1.5) },
+  statLead1: { ...typography.title, fontSize: 21, color: colors.textOnDark },
+  statValue: { ...typography.heading, fontSize: 18, color: colors.textOnDark },
   statLabel: { ...typography.caption, color: colors.textOnDarkMuted },
   notice: {
     flexDirection: 'row', alignItems: 'center', gap: spacing(3),

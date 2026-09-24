@@ -7,10 +7,20 @@
  */
 
 export const colors = {
-  /** The blue used across their marketing site. */
+  /** The blue used across their marketing site. Decorative only. */
   brand: '#0099F9',
   brandBright: '#4FA8FF',
   brandDeep: '#0D6BFF',
+
+  /**
+   * The blue to use for text, icons and links on a light surface.
+   *
+   * The marketing blue is #0099F9, which measures 3.03:1 against white and so
+   * fails WCAG AA for body text. This darker blue reads as the same colour at
+   * a glance and measures 5.90:1. Use `brand` to fill a shape, `brandInk` for
+   * anything a person has to read.
+   */
+  brandInk: '#0B5FD0',
 
   /** The navy the site uses behind hero sections. */
   navy: '#0B1F3B',
@@ -24,6 +34,8 @@ export const colors = {
 
   surface: '#FFFFFF',
   surfaceSunken: '#F6F8FB',
+  /** Field fill on a light form. Light enough to keep placeholder text at AA. */
+  field: '#F2F5FA',
   border: '#E5E7EB',
 
   success: '#12B76A',
@@ -40,7 +52,12 @@ export const colors = {
 export const gradients = {
   hero: ['#1E90FF', '#0B1F3B'] as const,
   deep: ['#0A1628', '#032C92', '#0A1628'] as const,
-  bright: ['#4FA8FF', '#0D6BFF'] as const,
+  /**
+   * The primary button. Darkened from the marketing pair so a white label
+   * passes AA across the whole sweep: the original started at #4FA8FF, where
+   * white measures 2.51:1. These ends measure 5.90:1 and 10.24:1.
+   */
+  bright: ['#0B5FD0', '#063C8F'] as const,
 } as const;
 
 /** A 4pt grid. Every margin in the app is a multiple of this. */

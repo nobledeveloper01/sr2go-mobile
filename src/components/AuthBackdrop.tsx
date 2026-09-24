@@ -1,63 +1,94 @@
 /**
  * The backdrop behind the auth screens.
  *
- * The first version was a flat gradient, which was clean but anonymous. This
- * adds depth with three soft shapes: a wide glow behind the heading, a ring
- * that breaks the edge, and a low warm blue lift at the bottom. They are
- * blurred circles rather than images, so they cost nothing to ship and scale
- * to any screen.
+ * Light rather than dark, for a measured reason. On the earlier navy version
+ * the placeholder text inside the fields measured 2.28:1 against its
+ * background, well under the 4.5:1 WCAG AA asks for. On white the same grey
+ * measures 4.54:1 and passes. Form fields are the one place a user has to read
+ * small, low emphasis text, so the form decides the background.
  *
- * Everything is drawn from the same three brand colours the gradients use, so
- * it reads as depth rather than decoration.
+ * The brand colour is still here, as shapes behind the content rather than
+ * underneath the text. Colour that fills a shape has no contrast requirement;
+ * colour behind a word does.
+ *
+ * The shapes drift slowly and continuously. The movement is small enough to
+ * read as depth rather than decoration, and it is the only thing on the screen
+ * that moves once the form has settled.
  */
-import { StyleSheet, View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { Animated, Easing, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { GradientBackground } from './GradientBackground';
 import { colors } from '../theme';
 
 export function AuthBackdrop() {
+  const drift = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(drift, { toValue: 1, duration: 9000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.timing(drift, { toValue: 0, duration: 9000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+      ]),
+    );
+
+    loop.start();
+
+    return () => loop.stop();
+  }, [drift]);
+
+  /** Each shape moves a slightly different distance, so they never look welded together. */
+  const float = (x: number, y: number, scale = 1) => ({
+    transform: [
+      { translateX: drift.interpolate({ inputRange: [0, 1], outputRange: [0, x] }) },
+      { translateY: drift.interpolate({ inputRange: [0, 1], outputRange: [0, y] }) },
+      { scale: drift.interpolate({ inputRange: [0, 1], outputRange: [1, scale] }) },
+    ],
+  });
+
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <GradientBackground variant="deep" />
+    <View style={[StyleSheet.absoluteFill, styles.base]} pointerEvents="none">
+      <Animated.View style={[styles.washWrap, float(14, 10, 1.05)]}>
+        <LinearGradient
+          colors={['rgba(79,168,255,0.26)', 'rgba(79,168,255,0)']}
+          start={{ x: 0.15, y: 0 }}
+          end={{ x: 0.85, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+      </Animated.View>
 
-      {/* Behind the heading, lifting the top third away from the flat navy. */}
-      <LinearGradient
-        colors={[colors.brandBright, 'transparent']}
-        start={{ x: 0.1, y: 0 }}
-        end={{ x: 0.9, y: 1 }}
-        style={styles.glow}
-      />
+      <Animated.View style={[styles.ring, float(-18, 12, 1.04)]} />
+      <Animated.View style={[styles.ringInner, float(12, -14, 0.96)]} />
+      <Animated.View style={[styles.corner, float(-10, 8, 1.08)]} />
 
-      {/* An outlined circle running off the right edge. Breaking the frame
-          stops the composition feeling like a centred template. */}
-      <View style={styles.ring} />
-      <View style={styles.ringInner} />
-
-      {/* A quiet lift at the foot, so the bottom of the screen is not the
-          darkest part of it. */}
-      <LinearGradient
-        colors={['transparent', 'rgba(13,107,255,0.28)']}
-        style={styles.floor}
-      />
+      {/* A small solid dot low on the left, to stop the bottom half of the
+          screen being completely empty once the keyboard is down. */}
+      <Animated.View style={[styles.dot, float(8, -12, 1.1)]} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  glow: {
-    position: 'absolute', top: -180, left: -120,
-    width: 420, height: 420, borderRadius: 210, opacity: 0.22,
-  },
+  base: { backgroundColor: colors.surface },
+  washWrap: { position: 'absolute', top: -140, left: -90, width: 460, height: 420, borderRadius: 230, overflow: 'hidden' },
   ring: {
-    position: 'absolute', top: 120, right: -150,
+    position: 'absolute', top: 96, right: -160,
     width: 300, height: 300, borderRadius: 150,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1.5, borderColor: 'rgba(11,95,208,0.16)',
   },
   ringInner: {
-    position: 'absolute', top: 190, right: -80,
+    position: 'absolute', top: 168, right: -92,
     width: 170, height: 170, borderRadius: 85,
-    borderWidth: 1, borderColor: 'rgba(79,168,255,0.22)',
+    borderWidth: 1.5, borderColor: 'rgba(0,153,249,0.22)',
   },
-  floor: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 320 },
+  corner: {
+    position: 'absolute', top: -70, right: -70,
+    width: 150, height: 150, borderRadius: 75,
+    backgroundColor: 'rgba(0,153,249,0.14)',
+  },
+  dot: {
+    position: 'absolute', bottom: 120, left: -46,
+    width: 130, height: 130, borderRadius: 65,
+    backgroundColor: 'rgba(11,95,208,0.07)',
+  },
 });

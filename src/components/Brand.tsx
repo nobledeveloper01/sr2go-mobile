@@ -23,11 +23,10 @@ const styles = StyleSheet.create({
   badge: {
     width: 48, height: 48, borderRadius: radii.lg,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.24)',
+    backgroundColor: colors.brandInk,
   },
   badgeCompact: { width: 36, height: 36, borderRadius: radii.md },
-  word: { ...typography.title, color: colors.textOnDark },
-  wordCompact: { ...typography.heading, color: colors.textOnDark },
-  tag: { ...typography.caption, color: colors.textOnDarkMuted, marginTop: 2 },
+  word: { ...typography.title, color: colors.text },
+  wordCompact: { ...typography.heading, color: colors.text },
+  tag: { ...typography.caption, color: colors.textMuted, marginTop: 2 },
 });

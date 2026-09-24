@@ -22,6 +22,6 @@ export function LegalLink({ url, label, onDark = true }: { url: string; label: s
 }
 
 const styles = StyleSheet.create({
-  link: { ...typography.caption, color: colors.brandBright, fontWeight: '700' },
-  linkOnLight: { color: colors.brand },
+  link: { ...typography.caption, color: colors.brandInk, fontWeight: '700' },
+  linkOnLight: { color: colors.brandInk },
 });

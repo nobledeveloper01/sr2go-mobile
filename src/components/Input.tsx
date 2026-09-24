@@ -62,7 +62,7 @@ export function Input({ label, error, secure = false, icon, ...rest }: Props) {
 
 const styles = StyleSheet.create({
   wrap: { gap: spacing(1.5) },
-  label: { ...typography.label, color: colors.textOnDarkMuted },
+  label: { ...typography.label, color: colors.textMuted },
   field: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -71,13 +71,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing(4),
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.border,
+    backgroundColor: colors.field,
   },
-  fieldFocused: { borderColor: colors.brandBright, backgroundColor: 'rgba(255,255,255,0.12)' },
+  fieldFocused: { borderColor: colors.brandInk, backgroundColor: colors.surface },
   fieldError: { borderColor: colors.danger },
   icon: { opacity: 0.85 },
-  input: { flex: 1, ...typography.body, color: colors.textOnDark },
+  input: { flex: 1, ...typography.body, color: colors.text },
   // Reserved height, so showing an error never moves the rest of the form.
   error: { ...typography.caption, color: colors.danger, minHeight: 16 },
 });

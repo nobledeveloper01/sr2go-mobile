@@ -2,6 +2,7 @@
 export type AuthStackParams = {
   SignIn: undefined;
   SignUp: undefined;
+  ForgotPassword: undefined;
 };
 
 export type AppTabsParams = {

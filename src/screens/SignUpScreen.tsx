@@ -10,6 +10,7 @@ import { AuthBackdrop } from '../components/AuthBackdrop';
 import { Input } from '../components/Input';
 import { Screen } from '../components/Screen';
 import { useAuth } from '../context/AuthContext';
+import { useStatusBarStyle } from '../hooks/useStatusBarStyle';
 import { useAuthForm } from '../hooks/useAuthForm';
 import type { AuthStackParams } from '../navigation/types';
 import { colors, radii, spacing, typography } from '../theme';
@@ -19,6 +20,8 @@ import { validateSignUp } from '../utils/validation';
 type Props = NativeStackScreenProps<AuthStackParams, 'SignUp'>;
 
 export function SignUpScreen({ navigation }: Props) {
+  useStatusBarStyle('dark');
+
   const { signUp } = useAuth();
 
   /**
@@ -47,7 +50,7 @@ export function SignUpScreen({ navigation }: Props) {
 
       <Screen scroll>
         <Pressable onPress={navigation.goBack} hitSlop={12} style={styles.back} accessibilityRole="button" accessibilityLabel="Go back">
-          <ArrowLeft size={22} color={colors.textOnDark} />
+          <ArrowLeft size={22} color={colors.text} />
         </Pressable>
 
         <View style={styles.intro}>
@@ -61,7 +64,7 @@ export function SignUpScreen({ navigation }: Props) {
             value={form.values.full_name}
             onChangeText={(text) => form.setField('full_name', text)}
             error={form.errors.full_name}
-            icon={<User size={18} color={colors.textOnDarkMuted} />}
+            icon={<User size={18} color={colors.textMuted} />}
             placeholder="Marvellous Bamisaye"
             autoCapitalize="words"
             autoComplete="name"
@@ -72,7 +75,7 @@ export function SignUpScreen({ navigation }: Props) {
             value={form.values.email}
             onChangeText={(text) => form.setField('email', text)}
             error={form.errors.email}
-            icon={<Mail size={18} color={colors.textOnDarkMuted} />}
+            icon={<Mail size={18} color={colors.textMuted} />}
             placeholder="you@example.com"
             keyboardType="email-address"
             autoCapitalize="none"
@@ -84,7 +87,7 @@ export function SignUpScreen({ navigation }: Props) {
             value={form.values.phone}
             onChangeText={(text) => form.setField('phone', text)}
             error={form.errors.phone}
-            icon={<Phone size={18} color={colors.textOnDarkMuted} />}
+            icon={<Phone size={18} color={colors.textMuted} />}
             placeholder="08031234567"
             keyboardType="phone-pad"
             autoComplete="tel"
@@ -95,7 +98,7 @@ export function SignUpScreen({ navigation }: Props) {
             value={form.values.password}
             onChangeText={(text) => form.setField('password', text)}
             error={form.errors.password}
-            icon={<Lock size={18} color={colors.textOnDarkMuted} />}
+            icon={<Lock size={18} color={colors.textMuted} />}
             placeholder="At least 8 characters"
             secure
             autoComplete="new-password"
@@ -152,19 +155,19 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   back: { width: 40, height: 40, justifyContent: 'center', marginBottom: spacing(4) },
   intro: { gap: spacing(2), marginBottom: spacing(6) },
-  title: { ...typography.display, color: colors.textOnDark },
-  subtitle: { ...typography.body, color: colors.textOnDarkMuted },
+  title: { ...typography.display, color: colors.text },
+  subtitle: { ...typography.body, color: colors.textMuted },
   form: { gap: spacing(1) },
   consent: { marginTop: spacing(2), marginBottom: spacing(3) },
   consentText: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center' },
-  consentLead: { ...typography.caption, color: colors.textOnDarkMuted, lineHeight: 19 },
+  consentLead: { ...typography.caption, color: colors.textMuted, lineHeight: 19 },
   banner: {
-    backgroundColor: 'rgba(229,72,77,0.16)', borderWidth: 1, borderColor: 'rgba(229,72,77,0.4)',
+    backgroundColor: '#FDECEC', borderWidth: 1, borderColor: '#F5C2C2',
     borderRadius: radii.md, padding: spacing(3.5), marginBottom: spacing(2),
   },
-  bannerText: { ...typography.body, color: '#FFB4B4' },
-  waiting: { ...typography.caption, color: colors.textOnDarkMuted, textAlign: 'center', marginTop: spacing(3) },
+  bannerText: { ...typography.body, color: '#B42318' },
+  waiting: { ...typography.caption, color: colors.textMuted, textAlign: 'center', marginTop: spacing(3) },
   footer: { flexDirection: 'row', justifyContent: 'center', gap: spacing(2), marginTop: 'auto', paddingTop: spacing(8) },
-  footerText: { ...typography.body, color: colors.textOnDarkMuted },
-  footerLink: { ...typography.body, color: colors.brandBright, fontWeight: '700' },
+  footerText: { ...typography.body, color: colors.textMuted },
+  footerLink: { ...typography.body, color: colors.brandInk, fontWeight: '700' },
 });

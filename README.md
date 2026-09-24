@@ -20,6 +20,7 @@ handling is the part that is actually easy to get wrong.
 - **Splash** that checks for a saved session while it plays
 - **Sign in** against `POST /api/auth/login`
 - **Sign up** against `POST /api/auth/register`, with terms acceptance
+- **Forgot password**, as a working screen against an endpoint that does not exist yet
 - **Dashboard** with your real name and verification status from the API
 - **Trip detail**, opened by tapping a trip
 - **Profile** showing your real account, with legal links, sign out and account deletion
@@ -59,6 +60,24 @@ A screen never calls `fetch`, never sees a status code, and never touches a
 token. It calls a named function and gets back typed data or a clear error.
 
 ## Decisions worth explaining
+
+### The colours are measured, not eyeballed
+
+The auth screens started dark. They are light now because the placeholder text
+inside the form fields measured **2.28:1** against the navy background, well
+under the 4.5:1 that WCAG AA asks for. The same grey on white measures 4.54:1.
+
+Two more failures turned up once I started measuring:
+
+- The marketing blue `#0099F9` measures **3.03:1** on white, so it fails as
+  text. There is now a separate `brandInk` (`#0B5FD0`, 5.90:1) for anything a
+  person has to read. Use the bright blue to fill a shape, the ink to write.
+- The primary button's gradient started at `#4FA8FF`, where a white label
+  measures **2.51:1**. The gradient is darker now and the label passes across
+  the whole sweep.
+
+The brand colour did not go away, it moved. It is in the shapes behind the
+content, where nothing has to be read on top of it and contrast does not apply.
 
 ### The token is in secure storage, not AsyncStorage
 
@@ -157,3 +176,5 @@ belong to instead of showing one generic line at the top.
   functions and worth covering first.
 - **Phone verification**, since the API already reports `phone_verified` and the
   dashboard already prompts for it.
+- **Password reset for real.** The screen, the validation and the confirmation
+  state are built. It needs a reset endpoint, which the API does not have.

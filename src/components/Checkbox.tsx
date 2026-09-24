@@ -40,8 +40,8 @@ const styles = StyleSheet.create({
   box: {
     width: 22, height: 22, borderRadius: radii.sm, marginTop: 1,
     alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.38)',
+    borderWidth: 1.5, borderColor: '#9AA6B8',
   },
-  boxChecked: { backgroundColor: colors.brandDeep, borderColor: colors.brandDeep },
+  boxChecked: { backgroundColor: colors.brandInk, borderColor: colors.brandInk },
   label: { flex: 1 },
 });

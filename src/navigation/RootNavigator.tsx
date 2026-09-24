@@ -12,6 +12,7 @@ import { Home, Route, User, Wallet } from 'lucide-react-native';
 import { Platform, StyleSheet } from 'react-native';
 
 import { useAuth } from '../context/AuthContext';
+import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { TripDetailScreen } from '../screens/TripDetailScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
@@ -46,6 +47,7 @@ function AuthNavigator() {
     <AuthStack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
       <AuthStack.Screen name="SignIn" component={SignInScreen} />
       <AuthStack.Screen name="SignUp" component={SignUpScreen} />
+      <AuthStack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
     </AuthStack.Navigator>
   );
 }
